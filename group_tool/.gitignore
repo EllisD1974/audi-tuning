@@ -1,2 +1,5 @@
-.idea
+.idea/
 apps_config.json
+
+dist/
+build/
