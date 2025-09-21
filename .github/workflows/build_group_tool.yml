@@ -30,7 +30,7 @@ jobs:
     - name: Build executable
       working-directory: group_tool
       run: |
-        pyinstaller --onefile --windowed main.py
+        pyinstaller WorkflowManager.spec
 
     - name: Upload EXE artifact
       uses: actions/upload-artifact@v4
