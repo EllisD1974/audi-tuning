@@ -3,6 +3,8 @@ name: Build Group Tool App
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'group_tool/**'   # Only trigger if files in group_tool/ change
   workflow_dispatch:
 
 jobs:
