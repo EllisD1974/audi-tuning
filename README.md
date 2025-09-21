@@ -13,5 +13,7 @@ Useful tuning video - https://www.youtube.com/watch?v=zv9g1bt3Nzs
 
 - NefMotoOpenSource github download - https://github.com/NefMoto/NefMotoOpenSource/releases/tag/untagged-e20abb0e723e4035e953
 - TunerPro software site download - http://www.markmansur.com/downloadApp.htm
-- 
+- ME7Check source with exe download - https://github.com/nyetwurk/ME7Sum/
+    - See README for notes, seems that this can check AND make fixes?!?!
+
 
