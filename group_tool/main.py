@@ -5,9 +5,10 @@ import subprocess
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout,
     QPushButton, QTextEdit, QFileDialog, QMessageBox, QListWidget,
-    QFileIconProvider, QListWidgetItem
+    QFileIconProvider, QListWidgetItem, QInputDialog, QCheckBox,
+    QDialog, QDialogButtonBox, QFormLayout, QMenu
 )
-from PyQt5.QtCore import QProcess, QFileInfo
+from PyQt5.QtCore import QProcess, QFileInfo, Qt
 
 
 CONFIG_FILE = "apps_config.json"
@@ -30,12 +31,19 @@ class WorkflowLauncher(QMainWindow):
         self.app_list = QListWidget()
         self.populate_app_list()
         self.app_list.itemDoubleClicked.connect(self.launch_selected_app)
+        self.app_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.app_list.customContextMenuRequested.connect(self.show_context_menu)
         self.layout.addWidget(self.app_list)
 
         # Button to launch selected app
         self.launch_button = QPushButton("Launch Selected App")
         self.launch_button.clicked.connect(self.launch_selected_app)
         self.layout.addWidget(self.launch_button)
+
+        # Button to add new app
+        self.add_button = QPushButton("Add Application")
+        self.add_button.clicked.connect(self.add_application)
+        self.layout.addWidget(self.add_button)
 
         # Output area (for CLI tools)
         self.output_area = QTextEdit()
@@ -151,6 +159,70 @@ class WorkflowLauncher(QMainWindow):
     def handle_finished(self):
         self.output_area.append("\n--- Process Finished ---\n")
         self.process = None
+
+    def add_application(self):
+        """Add a new application from the UI."""
+        exe_path, _ = QFileDialog.getOpenFileName(self, "Select Application Executable")
+        if not exe_path:
+            return
+
+        # Default name = filename
+        default_name = os.path.splitext(os.path.basename(exe_path))[0]
+        name, ok = QInputDialog.getText(self, "Application Name", "Enter name:", text=default_name)
+        if not ok or not name.strip():
+            return
+        name = name.strip()
+
+        # Optional settings dialog
+        dialog = QDialog(self)
+        dialog.setWindowTitle(f"Settings for {name}")
+        layout = QFormLayout(dialog)
+        cli_checkbox = QCheckBox("CLI Tool (capture output)")
+        file_input_checkbox = QCheckBox("File Input (prompt for file)")
+        layout.addRow(cli_checkbox)
+        layout.addRow(file_input_checkbox)
+
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        buttons.accepted.connect(dialog.accept)
+        buttons.rejected.connect(dialog.reject)
+        layout.addWidget(buttons)
+
+        if dialog.exec_() != QDialog.Accepted:
+            return
+
+        app_info = {
+            "path": exe_path,
+            "cli": cli_checkbox.isChecked(),
+            "file_input": file_input_checkbox.isChecked()
+        }
+        self.config[name] = app_info
+        self.save_config()
+
+    def show_context_menu(self, position):
+        """Show right-click menu for app list items."""
+        item = self.app_list.itemAt(position)
+        if item is None:
+            return
+
+        menu = QMenu()
+        remove_action = menu.addAction("Remove Application")
+        # You can add more actions here later, e.g. Edit, Settings, etc.
+
+        action = menu.exec_(self.app_list.viewport().mapToGlobal(position))
+        if action == remove_action:
+            self.remove_app(item.text())
+
+    def remove_app(self, name):
+        """Remove an application from the config and update the list."""
+        confirm = QMessageBox.question(
+            self, "Confirm Removal",
+            f"Are you sure you want to remove '{name}' from the list?",
+            QMessageBox.Yes | QMessageBox.No
+        )
+        if confirm == QMessageBox.Yes:
+            if name in self.config:
+                del self.config[name]
+                self.save_config()  # This will refresh the list
 
 
 if __name__ == "__main__":
