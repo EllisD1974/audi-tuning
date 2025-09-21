@@ -1,5 +1,8 @@
 # audi-tuning
+I have a 2001 Audi B5 S4 and I'm working on learning to tune it ect...
+I've noticed there are lots of different applications, many open source, to run and I figured having a central app to manage everything would be helpful.
 
+I also figured I could use this to track future tunes that I generate.
 
 
 # Nef moto stuff
