@@ -2,6 +2,7 @@ import sys
 import os
 import json
 import subprocess
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout,
     QPushButton, QTextEdit, QFileDialog, QMessageBox, QListWidget,
@@ -12,6 +13,12 @@ from PyQt5.QtCore import QProcess, QFileInfo, Qt
 
 
 CONFIG_FILE = "apps_config.json"
+
+
+def resource_path(relative_path):
+    if hasattr(sys, "_MEIPASS"):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
 
 class WorkflowLauncher(QMainWindow):
@@ -227,6 +234,7 @@ class WorkflowLauncher(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon(resource_path("resources/icons/icon.ico")))
     win = WorkflowLauncher()
     win.show()
     sys.exit(app.exec_())
