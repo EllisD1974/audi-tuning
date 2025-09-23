@@ -3,3 +3,5 @@ apps_config.json
 
 dist/
 build/
+
+.venv/
